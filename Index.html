@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trivia Elemental | Náhuatl</title>
+    <style>
+        :root {
+            --panel-bg: rgba(255, 255, 255, 0.88);
+            --accent-water: #0284c7;
+            --accent-fire: #ea580c;
+            --accent-wind: #16a34a;
+            --text-color: #1f2937;
+            --border-color: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0ea5e9, #f97316, #10b981, #6366f1);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background-color: var(--panel-bg);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, var(--accent-water), var(--accent-fire), var(--accent-wind));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        p.subtitle {
+            color: #4b5563;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 12px 0;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-play {
+            background: linear-gradient(135deg, #38bdf8, #0284c7);
+            color: #fff;
+        }
+
+        .btn-time {
+            background: linear-gradient(135deg, #fb923c, #ea580c);
+            color: #fff;
+        }
+
+        .btn-info {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-audio {
+            background: linear-gradient(135deg, #4ade80, #16a34a);
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Estilos de la Trivia */
+        .question-box {
+            font-size: 1.15rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .btn-option {
+            background-color: #ffffff;
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-option:hover {
+            background-color: #f1f5f9;
+            border-color: var(--accent-water);
+        }
+
+        .btn-option.correct {
+            background-color: #dcfce7 !important;
+            border-color: #16a34a !important;
+            color: #15803d !important;
+        }
+
+        .btn-option.incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #dc2626 !important;
+            color: #b91c1c !important;
+        }
+
+        .feedback-msg {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+            min-height: 35px;
+        }
+
+        /* Pantalla de Resultados y Rangos */
+        .rank-badge {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin: 15px 0;
+            padding: 12px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #fef08a, #fde047);
+            color: #854d0e;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 2px solid #facc15;
+        }
+
+        .results-summary {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: #334155;
+            font-weight: 600;
+        }
+
+        /* Sección de Información */
+        .info-content {
+            text-align: left;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #334155;
+        }
+
+        .info-content ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .score-board {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: var(--accent-wind);
+            font-weight: bold;
+        }
+
+        .timer-board {
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+            color: var(--accent-fire);
+            font-weight: bold;
+        }
+
+        .mode-section {
+            margin-bottom: 20px;
+        }
+
+        .mode-label {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- PANTALLA INICIAL -->
+        <div id="home-screen">
+            <h1>Trivia Elemental</h1>
+            <p class="subtitle">Explora los elementos y sus nombres en náhuatl</p>
+            
+            <button class="btn btn-audio" id="audio-btn" onclick="toggleAmbientMusic()">🎵 Activar Sonido Elemental</button>
+            
+            <button class="btn btn-play" onclick="showModes()">Jugar</button>
+            <button class="btn btn-info" onclick="showInfo()">Más información</button>
+        </div>
+
+        <!-- PANTALLA DE SELECCIÓN DE MODO -->
+        <div id="mode-screen" class="hidden">
+            <h1>Modos de Juego</h1>
+            <p class="subtitle">Elige cómo deseas poner a prueba tus conocimientos</p>
+            
+            <div class="mode-section">
+                <button class="btn btn-time" onclick="startTrivia('hard')">Contrarreloj</button>
+                <div class="mode-label">Nivel difícil (20s por pregunta)</div>
+            </div>
+
+            <div class="mode-section">
+                <button class="btn btn-play" onclick="startTrivia('normal')">Normal</button>
+                <div class="mode-label">Nivel fácil (sin límite)</div>
+            </div>
+
+            <button class="btn btn-info" style="margin-top: 15px;" onclick="goHome()">Volver</button>
+        </div>
+
+        <!-- PANTALLA DE TRIVIA -->
+        <div id="trivia-screen" class="hidden">
+            <div id="score" class="score-board">Puntuación: 0</div>
+            <div id="timer" class="timer-board hidden">Tiempo: 20s</div>
+            <div id="feedback" class="feedback-msg"></div>
+            <div id="question-container" class="question-box">Cargando pregunta...</div>
+            <div id="options-container" class="options-grid"></div>
+            <button class="btn btn-info" id="back-btn" onclick="goHome()">Volver al inicio</button>
+        </div>
+
+        <!-- PANTALLA DE MÁS INFORMACIÓN -->
+        <div id="info-screen" class="hidden">
+            <h1>Sobre el Idioma</h1>
+            <div class="info-content">
+                <p>Esta página está inspirada en la riqueza lingüística del náhuatl, una lengua mesoamericana caracterizada por su gran expresividad y su naturaleza aglutinante:</p>
+                <ul>
+                    <li><strong>Sinónimos y variantes:</strong> Cuenta con diversas formas de nombrar un mismo fenómeno dependiendo de su intensidad o región.</li>
+                    <li><strong>Palabras compuestas:</strong> Permite unir raíces (como elementos de la naturaleza, acciones o movimientos) para crear conceptos totalmente nuevos y muy descriptivos.</li>
+                    <li><strong>Cosmovisión:</strong> Cada término guarda una estrecha relación con el entorno natural y los elementos que lo rodean.</li>
+                </ul>
+            </div>
+            <button class="btn btn-play" style="margin-top: 20px;" onclick="goHome()">Volver</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "¿Cómo se dice 'agua' en náhuatl?",
+                options: ["Tletl", "Atl", "Ehecatl", "Quiyahuitl"],
+                answer: 1
+            },
+            {
+                question: "¿Cómo se dice 'fuego' en náhuatl?",
+                options: ["Tletl", "Atl", "Malinalli", "Apatiztli"],
+                answer: 0
+            },
+            {
+                question: "¿Cuál es la palabra en náhuatl para 'viento'?",
+                options: ["Tlapetlani", "Ehecamalotl", "Ehecatl", "Chichinolli"],
+                answer: 2
+            },
+            {
+                question: "¿Cómo se dice 'lluvia'?",
+                options: ["Quiyahuitl", "Tletl", "Atl", "Tlecuezallotl"],
+                answer: 0
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let gameMode = 'normal';
+        let timeLeft = 20;
+        let timerInterval = null;
+        let isAnswerLocked = false;
+
+        let audioCtx = null;
+        let audioInterval = null;
+        let isMusicPlaying = false;
+
+        function toggleAmbientMusic() {
+            const btn = document.getElementById('audio-btn');
+            if (!isMusicPlaying) {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                
+                const notes = [220, 277.18, 329.63, 392, 440];
+                audioInterval = setInterval(() => {
+                    if(!isMusicPlaying) return;
+                    const osc = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(notes[Math.floor(Math.random() * notes.length)], audioCtx.currentTime);
+                    
+                    gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3);
+                    
+                    osc.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 3);
+                }, 2000);
+
+                isMusicPlaying = true;
+                btn.innerText = "🔇 Desactivar Sonido Elemental";
+            } else {
+                clearInterval(audioInterval);
+                isMusicPlaying = false;
+                btn.innerText = "🎵 Activar Sonido Elemental";
+            }
+        }
+
+        function showModes() {
+            document.getElementById('home-screen').classList.add('hidden');
+            document.getElementById('mode-screen').classList.remove('hidden');
+        }
+
+        function showInfo() {
+            document.getElementById('home-screen').classList.add('hidden');
+            document.getElementById('info-screen').classList.remove('hidden');
+        }
+
+        function goHome() {
+            clearInterval(timerInterval);
+            document.getElementById('mode-screen').classList.add('hidden');
+            document.getElementById('trivia-screen').classList.add('hidden');
+            document.getElementById('info-screen').classList.add('hidden');
+            document.getElementById('home-screen').classList.remove('hidden');
+        }
+
+        function startTrivia(mode) {
+            gameMode = mode;
+            document.getElementById('mode-screen').classList.add('hidden');
+            document.getElementById('trivia-screen').classList.remove('hidden');
+            currentQuestion = 0;
+            score = 0;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            clearInterval(timerInterval);
+            isAnswerLocked = false;
+            document.getElementById('feedback').innerText = '';
+
+            if (currentQuestion >= questions.length) {
+                document.getElementById('timer').classList.add('hidden');
+                document.getElementById('score').innerText = '';
+                
+                // Determinar rango según puntuación
+                let rankTitle = "";
+                if (score === 4) {
+                    rankTitle = "🏆 Elemental Master";
+                } else if (score === 3) {
+                    rankTitle = "🔥 Elemental Expert";
+                } else if (score === 2) {
+                    rankTitle = "💧 Elemental Apprentice";
+                } else {
+                    rankTitle = "🌱 Element Novice";
+                }
+
+                document.getElementById('question-container').innerHTML = `
+                    <div class="results-summary">¡Trivia terminada!<br>Aciertos: ${score} de ${questions.length}</div>
+                    <div class="rank-badge">${rankTitle}</div>
+                `;
+                document.getElementById('options-container').innerHTML = `
+                    <button class="btn btn-play" onclick="showModes()">Jugar de nuevo</button>
+                    <button class="btn btn-info" onclick="goHome()">Volver al inicio</button>
+                `;
+                return;
+            }
+
+            if (gameMode === 'hard') {
+                timeLeft = 20;
+                document.getElementById('timer').innerText = `Tiempo: ${timeLeft}s`;
+                document.getElementById('timer').classList.remove('hidden');
+                
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    document.getElementById('timer').innerText = `Tiempo: ${timeLeft}s`;
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        document.getElementById('feedback').innerText = '❌ ¡Tiempo agotado!';
+                        isAnswerLocked = true;
+                        setTimeout(() => {
+                            currentQuestion++;
+                            loadQuestion();
+                        }, 1200);
+                    }
+                }, 1000);
+            } else {
+                document.getElementById('timer').classList.add('hidden');
+            }
+
+            const q = questions[currentQuestion];
+            document.getElementById('question-container').innerText = q.question;
+            document.getElementById('score').innerText = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            
+            const optionsHTML = q.options.map((opt, index) => `
+                <button class="btn-option" id="opt-${index}" onclick="checkAnswer(${index})">${opt}</button>
+            `).join('');
+            
+            document.getElementById('options-container').innerHTML = optionsHTML;
+        }
+
+        function checkAnswer(selected) {
+            if (isAnswerLocked) return;
+            isAnswerLocked = true;
+            clearInterval(timerInterval);
+
+            const q = questions[currentQuestion];
+            const selectedBtn = document.getElementById(`opt-${selected}`);
+            const correctBtn = document.getElementById(`opt-${q.answer}`);
+
+            if (selected === q.answer) {
+                score++;
+                selectedBtn.classList.add('correct');
+                document.getElementById('feedback').innerText = '✔️ ¡Correcto!';
+            } else {
+                selectedBtn.classList.add('incorrect');
+                correctBtn.classList.add('correct');
+                document.getElementById('feedback').innerText = '❌ ¡Incorrecto!';
+            }
+
+            setTimeout(() => {
+                currentQuestion++;
+                loadQuestion();
+            }, 1200);
+        }
+    </script>
+</body>
+</html>
